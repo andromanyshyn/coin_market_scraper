@@ -1,0 +1,116 @@
+[tool.black]
+line-length = 120
+target-version = ["py310"]
+
+[tool.pylint.main]
+extension-pkg-allow-list = [
+    "cv2",
+    "ujson",
+    "pydantic",
+]
+fail-under = 10.0
+ignore = ['.venv', 'CVS', 'devops', 'web_app', 'etl']
+limit-inference-results = 100
+load-plugins = "pylint.extensions.no_self_use,pylint_django"
+persistent = "yes"
+suggestion-mode = "yes"
+unsafe-load-any-extension = "no"
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "raw-checker-failed",
+    "bad-inline-option",
+    "locally-disabled",
+    "file-ignored",
+    "suppressed-message",
+    "useless-suppression",
+    "deprecated-pragma",
+    "use-symbolic-message-instead",
+    "too-few-public-methods",
+    "too-many-branches",
+    "too-many-statements",
+    "missing-docstring",
+    "fixme",
+    "dangerous-default-value",
+    "unspecified-encoding",
+    "use-list-literal",
+    "use-dict-literal",
+    "duplicate-code",
+    "logging-fstring-interpolation",
+    "too-many-locals",
+]
+enable = "c-extension-no-member"
+
+[tool.pylint.reports]
+output-format = "text"
+reports = "no"
+score = "yes"
+
+[tool.pylint.refactoring]
+max-nested-blocks = 5
+never-returning-functions = "sys.exit"
+
+[tool.pylint.basic]
+argument-naming-style = "snake_case"
+attr-naming-style = "snake_case"
+bad-names = [
+    "foo",
+    "bar",
+    "baz",
+    "toto",
+    "tutu",
+    "tata",
+]
+class-attribute-naming-style = "any"
+class-naming-style = "PascalCase"
+const-naming-style = "UPPER_CASE"
+docstring-min-length = 20
+function-naming-style = "snake_case"
+good-names = [
+    "e",
+    "i",
+    "j",
+    "k",
+    "ex",
+    "db",
+    "Run",
+    "_",
+    "N",
+]
+include-naming-hint = "yes"
+no-docstring-rgx = "^_"
+good-names-rgxs = "^[A-Z]{1}$"
+
+[tool.pylint.format]
+ignore-long-lines = "^\\s*(# )?<?https?://\\S+>?$"
+indent-string = '    '
+max-line-length = 120
+max-module-lines = 500
+single-line-class-stmt = "no"
+single-line-if-stmt = "no"
+
+[tool.pylint.similarities]
+min-similarity-lines = 10
+
+[tool.pylint.design]
+max-attributes = 8
+max-args = 5
+max-parents=15
+
+[tool.pylint.typecheck]
+generated-members = [
+    "cv2.*",
+    "torch.*",
+    "ujson.*",
+]
+ignore-mixin-members = "yes"
+ignore-none = "yes"
+ignored-classes = [
+    "optparse.Values",
+    "thread._local",
+    "_thread._local",
+]
+missing-member-hint-distance = 1
+missing-member-max-choices = 1
