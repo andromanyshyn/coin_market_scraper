@@ -13,7 +13,7 @@ from src.utils import calculate_average_value
 
 class KrakenWebSocket(BaseWebSocket):
     def __init__(self, db):
-        super().__init__(name=MARKETS["KRAKEN"]["name"], uri=MARKETS["KRAKEN"]["endpoint"], db=db)
+        super().__init__(name=MARKETS["Kraken"]["name"], uri=MARKETS["Kraken"]["endpoint"], db=db)
 
     @staticmethod
     async def fetch(session: aiohttp.ClientSession, url: str) -> dict:
@@ -21,7 +21,7 @@ class KrakenWebSocket(BaseWebSocket):
             return await response.json()
 
     async def fetch_kraken_pairs(self):
-        url = MARKETS["KRAKEN"]["pairs_endpoint"]
+        url = MARKETS["Kraken"]["pairs_endpoint"]
         tasks = []
         async with aiohttp.ClientSession() as session:
             tasks.append(self.fetch(session, url))

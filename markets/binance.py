@@ -10,7 +10,7 @@ from src.utils import calculate_average_value
 
 class BinanceWebSocket(BaseWebSocket):
     def __init__(self, db):
-        super().__init__(name=MARKETS["BINANCE"]["name"], uri=MARKETS["BINANCE"]["endpoint"], db=db)
+        super().__init__(name=MARKETS["Binance"]["name"], uri=MARKETS["Binance"]["endpoint"], db=db)
 
     async def connection(self) -> None:
         try:
@@ -27,10 +27,18 @@ class BinanceWebSocket(BaseWebSocket):
             logger.critical(str(e))
             raise e
 
-    async def handler_data(self, data: list[dict]) -> None:
+    async def handler_data(self, data) -> None:
         cache = self.db.setdefault(self.name, {})
+        print(["DATA"], data)
+        if isinstance(data, dict):
+            lst = []
+            lst.append(data)
+            data = lst
         for ticker in data:
-            average_price = await calculate_average_value(ticker["b"], ticker["a"])
+            try:
+                average_price = await calculate_average_value(ticker["b"], ticker["a"])
+            except TypeError as e:
+                raise e
             cache[ticker['s']] = {
                 'ask': ticker['a'],
                 'bid': ticker['b'],

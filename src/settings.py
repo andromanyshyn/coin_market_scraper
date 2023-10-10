@@ -25,13 +25,17 @@ logging.config.dictConfig(LOGGING)
 logger.level("INFO" if not DEBUG else "DEBUG")
 
 MARKETS = {
-    "KRAKEN": {
+    "Kraken": {
         "name": "kraken",
         "endpoint": "wss://ws.kraken.com/",
         "pairs_endpoint": "https://api.kraken.com/0/public/AssetPairs",
     },
-    "BINANCE": {
+    "Binance": {
         "name": "binance",
         "endpoint": "wss://stream.binance.com:9443/ws/!ticker@arr",
+    },
+    "Bitfinex": {
+        "name": "bitfinex",
+        "endpoint": "wss://api-pub.bitfinex.com/ws/2",
     },
 }
