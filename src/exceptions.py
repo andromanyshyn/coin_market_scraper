@@ -1,17 +1,17 @@
 class CryptoBaseException(Exception):
-    message: str = ''
+    message: str = ""
 
-    def __init__(self, *args: object, msg: str = '') -> None:
+    def __init__(self, *args: object, msg: str = "") -> None:
         self.message = msg or self.message
         super().__init__(*args)
 
     def __str__(self) -> str:
-        return self.message + f'Details: {self.args}'
+        return self.message + f"Details: {self.args}"
 
 
 class WebsocketConnectionError(ConnectionError):
-    message = 'Connection Error. '
+    message = "Connection Error. "
 
 
 class WebsocketMessageSendingError(CryptoBaseException):
-    message = 'Error sending message. '
+    message = "Error sending message. "

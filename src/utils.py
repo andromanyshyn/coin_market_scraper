@@ -23,5 +23,5 @@ def calculate_average_value(buy: str, sell: str) -> float:
 
 
 def validate_crypto_pair(pair: str) -> bool:
-    pattern = '^[A-Za-z0-9]+$'
+    pattern = "^[A-Za-z0-9]+$"
     return bool(re.match(pattern, pair))

@@ -1,5 +1,7 @@
 import json
+
 import websockets
+
 from common.views import BaseWebSocketMixin
 from src.exceptions import WebsocketConnectionError
 from src.settings import MARKETS, logger
@@ -10,10 +12,10 @@ class BinanceWebSocket(BaseWebSocketMixin):
     def __init__(self, db: dict):
         super().__init__(name=MARKETS["Binance"]["name"], uri=MARKETS["Binance"]["endpoint"], db=db)
 
-    '''
+    """
     Binance has !ticker@arr endpoint which response for all current pairs with have updates. 
     No need request any pairs before or subscribe for all pairs one by one.
-    '''
+    """
 
     # method for establishing the WebSocket connection.
     async def connection(self) -> None:
@@ -42,8 +44,8 @@ class BinanceWebSocket(BaseWebSocketMixin):
             except (ValueError, TypeError) as e:
                 logger.error(f"Error calculating average price for ticker {ticker['s']}: {e}")
                 raise e
-            cache[ticker['s']] = {
-                'ask': ticker['a'],
-                'bid': ticker['b'],
-                'ask_bid_average': average_price,
+            cache[ticker["s"]] = {
+                "ask": ticker["a"],
+                "bid": ticker["b"],
+                "ask_bid_average": average_price,
             }

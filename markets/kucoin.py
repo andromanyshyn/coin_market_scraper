@@ -5,31 +5,30 @@ import aiohttp
 import websockets
 
 from common.views import BaseWebSocketMixin
-from src.exceptions import (WebsocketConnectionError,
-                            WebsocketMessageSendingError)
+from src.exceptions import WebsocketConnectionError, WebsocketMessageSendingError
 from src.settings import MARKETS, logger
 from src.utils import calculate_average_value
 
 
 class KucoinWebSocket(BaseWebSocketMixin):
-    '''
+    """
     Kukoin include wss channel for retrieving all traging pairs on the exchange
     We need to subscribe to channel and receive the information.
-    '''
+    """
 
     def __init__(self, db: dict):
         super().__init__(name=MARKETS["Kucoin"]["name"], db=db, uri=None)
 
     @staticmethod
     async def get_access_token() -> dict:
-        '''
+        """
         KuCoin requires an access token from a REST API empty post request for connection to Websocket
-        '''
+        """
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post('https://api.kucoin.com/api/v1/bullet-public') as response:
+                async with session.post("https://api.kucoin.com/api/v1/bullet-public") as response:
                     response_data = await response.json()
-                    ws_token_access = response_data['data']['token']
+                    ws_token_access = response_data["data"]["token"]
                     url = f"wss://ws-api-spot.kucoin.com/?token={ws_token_access}"
                     ping_interval = response_data["data"]["instanceServers"][0]["pingInterval"]
                     data = {
@@ -47,10 +46,9 @@ class KucoinWebSocket(BaseWebSocketMixin):
         last_ping_time = None
 
         async def hold_server_connection(
-                websocket: websockets.WebSocketClientProtocol,
-                ping_interval: int,
+            websocket: websockets.WebSocketClientProtocol,
+            ping_interval: int,
         ) -> None:
-
             # [PING] - Sending message to the websocket for holding connection with the server
             message = {"type": "ping"}
             nonlocal last_ping_time
@@ -88,17 +86,12 @@ class KucoinWebSocket(BaseWebSocketMixin):
             raise e
 
     async def subscribe_event(self, websocket: websockets.WebSocketClientProtocol) -> None:
-        message = {
-            "id": 1545910660739,
-            "type": "subscribe",
-            "topic": "/market/ticker:all",
-            "response": True
-        }
+        message = {"id": 1545910660739, "type": "subscribe", "topic": "/market/ticker:all", "response": True}
         await websocket.send(json.dumps(message))
 
     async def handler_data(self, data: dict) -> None:
         cache = self.db.setdefault(self.name, {})
-        if 'subject' in data:
+        if "subject" in data:
             for _ in data["data"]:
                 try:
                     average_price = calculate_average_value(data["data"]["bestBid"], data["data"]["bestAsk"])
@@ -106,7 +99,7 @@ class KucoinWebSocket(BaseWebSocketMixin):
                     logger.error(f"Error calculating average price for ticker {data['subject']}: {e}  Kucoin")
                     raise e
                 cache[data["subject"].replace("-", "")] = {
-                    'ask': data["data"]["bestAsk"],
-                    'bid': data["data"]["bestBid"],
-                    'ask_bid_average': average_price,
+                    "ask": data["data"]["bestAsk"],
+                    "bid": data["data"]["bestBid"],
+                    "ask_bid_average": average_price,
                 }

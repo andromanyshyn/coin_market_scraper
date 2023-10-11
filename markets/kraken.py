@@ -5,18 +5,17 @@ import aiohttp
 import websockets
 
 from common.views import BaseWebSocketMixin
-from src.exceptions import (WebsocketConnectionError,
-                            WebsocketMessageSendingError)
+from src.exceptions import WebsocketConnectionError, WebsocketMessageSendingError
 from src.settings import MARKETS, logger
 from src.utils import calculate_average_value
 
 
 class KrakenWebSocket(BaseWebSocketMixin):
-    '''
+    """
     Kraken include API endpoint for retrieving all traging pairs on the exchange
     Before starting connection with main Kraken websocket for loading market data with price for all trading pairs,
     we collect primary information about all assets
-    '''
+    """
 
     def __init__(self, db):
         super().__init__(name=MARKETS["Kraken"]["name"], uri=MARKETS["Kraken"]["endpoint"], db=db)

@@ -1,6 +1,6 @@
 import asyncio
-import json
 import gzip
+import json
 
 import aiohttp
 import websockets
@@ -12,12 +12,12 @@ from src.utils import calculate_average_value
 
 
 class HuobiWebSocket(BaseWebSocketMixin):
-    '''
+    """
     Huobi WebSocket requires REST API request for symbols.
     Huobi haven't connection to all trading pairs or ticker, which response with trading symbols for
     Websocket Market Data subscribe.
     We Need to create a subscription request for each trading pair
-    '''
+    """
 
     def __init__(self, db: dict):
         super().__init__(name=MARKETS["Huobi"]["name"], uri=MARKETS["Huobi"]["endpoint"], db=db)
@@ -51,7 +51,7 @@ class HuobiWebSocket(BaseWebSocketMixin):
                 while True:
                     try:
                         response = await websocket.recv()
-                        decoded_response = gzip.decompress(response).decode('utf-8')
+                        decoded_response = gzip.decompress(response).decode("utf-8")
                     except Exception as e:
                         logger.error("Error while decoding response from HuobiAPI", str(e))
                         raise e
@@ -69,26 +69,24 @@ class HuobiWebSocket(BaseWebSocketMixin):
         assets_list = await self.fetch_huobi_assets()
         for element in assets_list:
             for asset in element["data"]:
-                if asset['state'] == 'online':
+                if asset["state"] == "online":
                     try:
-                        subscribe = {
-                            "sub": f"market.{asset['symbol']}.ticker"
-                        }
+                        subscribe = {"sub": f"market.{asset['symbol']}.ticker"}
                         await websocket.send(json.dumps(subscribe))
                     except Exception as e:
                         raise e
 
     async def handler_data(self, websocket: websockets.WebSocketClientProtocol, data: dict) -> None:
         cache = self.db.setdefault(self.name, {})
-        if 'ping' in data:
+        if "ping" in data:
             try:
-                await websocket.send(json.dumps({'pong': data['ping']}))
+                await websocket.send(json.dumps({"pong": data["ping"]}))
             except Exception as e:
                 logger.error(str(e))
                 raise e
 
-        elif 'ch' in data:
-            name = data['ch'].replace('market.', '').replace('.ticker', '').upper()
+        elif "ch" in data:
+            name = data["ch"].replace("market.", "").replace(".ticker", "").upper()
             try:
                 average = calculate_average_value(data["tick"]["ask"], data["tick"]["bid"])
             except (ValueError, TypeError, KeyError) as e:

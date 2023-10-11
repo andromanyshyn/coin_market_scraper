@@ -1,14 +1,14 @@
 import random
-import pytest
-
-from httpx import AsyncClient
-from src.app import app, DB
-from markets.binance import BinanceWebSocket
-from markets.kraken import KrakenWebSocket
-from markets.huobi import HuobiWebSocket
-import websockets
-
 from string import ascii_lowercase
+
+import pytest
+import websockets
+from httpx import AsyncClient
+
+from markets.binance import BinanceWebSocket
+from markets.huobi import HuobiWebSocket
+from markets.kraken import KrakenWebSocket
+from src.app import DB, app
 
 
 class TestGeneralAPI:
@@ -18,11 +18,11 @@ class TestGeneralAPI:
         params = {"pair": "BTCUSDT"}
 
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             message = response.json()
 
         assert response.status_code == 400
-        assert message == {'detail': 'Please specify the exchange'}
+        assert message == {"detail": "Please specify the exchange"}
 
     @staticmethod
     @pytest.mark.asyncio
@@ -30,15 +30,14 @@ class TestGeneralAPI:
         params = {"pair": "BTC_UDST", "exchange": "binance"}
 
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             message = response.json()
 
         assert response.status_code == 400
-        assert message == {'detail': 'Please specify the pair in format: a-z; A-Z; or a-z-0-9, example: BTCUSDT'}
+        assert message == {"detail": "Please specify the pair in format: a-z; A-Z; or a-z-0-9, example: BTCUSDT"}
 
 
 class TestWebsocketsHandlers:
-
     ####################################################################################
     # Binance Handler
     ####################################################################################
@@ -51,7 +50,7 @@ class TestWebsocketsHandlers:
             item = {
                 "s": cur,
                 "a": round(random.uniform(1995.00, 4995.00), 2),
-                "b": round(random.uniform(1995.00, 4995.00), 2)
+                "b": round(random.uniform(1995.00, 4995.00), 2),
             }
             sample_data.append(item)
         return sample_data
@@ -62,11 +61,7 @@ class TestWebsocketsHandlers:
         currencies = ["BTCUSDT", "ETHUSD"]
         sample_data = []
         for cur in currencies:
-            item = {
-                "s": cur,
-                "a": random.choice(ascii_lowercase),
-                "b": round(random.uniform(1995.00, 4995.00), 2)
-            }
+            item = {"s": cur, "a": random.choice(ascii_lowercase), "b": round(random.uniform(1995.00, 4995.00), 2)}
             sample_data.append(item)
         return sample_data
 
@@ -77,7 +72,7 @@ class TestWebsocketsHandlers:
 
         await binance_ws.handler_data(generate_valid_data_binance)
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             result_data = response.json()
 
         assert response.status_code == 200
@@ -97,7 +92,7 @@ class TestWebsocketsHandlers:
 
             await binance_ws.handler_data(generate_valid_data_binance)
             async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get("/", params=params)
+                response = await client.get("/currency/", params=params)
                 result_data = response.json()
 
                 ticket = result_data["ticket"]
@@ -111,7 +106,6 @@ class TestWebsocketsHandlers:
 
     @pytest.mark.asyncio
     async def test_binance_currency_failed(self, generate_invalid_data_binance: callable):
-
         binance_ws = BinanceWebSocket(db=DB)
 
         with pytest.raises(ValueError):
@@ -125,10 +119,7 @@ class TestWebsocketsHandlers:
     async def generate_valid_data_kraken():
         currency = "BTCUSDT"
         sample_data = [random.randint(1, 10)]
-        item = {
-            "a": [round(random.uniform(1995.00, 4995.00), 2)],
-            "b": [round(random.uniform(1995.00, 4995.00), 2)]
-        }
+        item = {"a": [round(random.uniform(1995.00, 4995.00), 2)], "b": [round(random.uniform(1995.00, 4995.00), 2)]}
         sample_data.append(item)
         sample_data.append(currency)
         return sample_data
@@ -139,11 +130,7 @@ class TestWebsocketsHandlers:
         currencies = ["BTCUSDT", "ETHUSD"]
         sample_data = []
         for cur in currencies:
-            item = {
-                "s": cur,
-                "a": random.choice(ascii_lowercase),
-                "b": round(random.uniform(1995.00, 4995.00), 2)
-            }
+            item = {"s": cur, "a": random.choice(ascii_lowercase), "b": round(random.uniform(1995.00, 4995.00), 2)}
             sample_data.append(item)
         return sample_data
 
@@ -154,7 +141,7 @@ class TestWebsocketsHandlers:
 
         await kraken_ws.handler_data(generate_valid_data_kraken)
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             result_data = response.json()
             print(result_data)
 
@@ -178,7 +165,7 @@ class TestWebsocketsHandlers:
 
             await kraken_ws.handler_data(generate_valid_data_kraken)
             async with AsyncClient(app=app, base_url="http://test") as client:
-                response = await client.get("/", params=params)
+                response = await client.get("/currency/", params=params)
                 result_data = response.json()
 
                 ticket = result_data["ticket"]
@@ -192,7 +179,6 @@ class TestWebsocketsHandlers:
 
     @pytest.mark.asyncio
     async def test_kraken_currency_failed(self, generate_invalid_data_kraken):
-
         kraken_ws = KrakenWebSocket(db=DB)
 
         with pytest.raises(TypeError):
@@ -207,8 +193,10 @@ class TestWebsocketsHandlers:
         currency = "btcusdt"
         item = {
             "ch": f"market.{currency}.ticker",
-            "tick": {"ask": round(random.uniform(1995.00, 4995.00), 2),
-                     "bid": round(random.uniform(1995.00, 4995.00), 2)}
+            "tick": {
+                "ask": round(random.uniform(1995.00, 4995.00), 2),
+                "bid": round(random.uniform(1995.00, 4995.00), 2),
+            },
         }
         return item
 
@@ -218,8 +206,7 @@ class TestWebsocketsHandlers:
         currency = "btcusdt"
         item = {
             "ch": f"market.{currency}.ticker",
-            "tick": {"ask": random.choice(ascii_lowercase),
-                     "bid": round(random.uniform(1995.00, 4995.00), 2)}
+            "tick": {"ask": random.choice(ascii_lowercase), "bid": round(random.uniform(1995.00, 4995.00), 2)},
         }
         return item
 
@@ -231,7 +218,7 @@ class TestWebsocketsHandlers:
 
         await huobi_ws.handler_data(websocket, generate_valid_data_huobi)
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             result_data = response.json()
         ask = generate_valid_data_huobi["tick"]["ask"]
         bid = generate_valid_data_huobi["tick"]["bid"]
@@ -243,12 +230,12 @@ class TestWebsocketsHandlers:
     async def test_huobi_currency_pair(self, generate_valid_data_huobi: callable):
         huobi_ws = HuobiWebSocket(db=DB)
         websocket = websockets.WebSocketClientProtocol()
-        pair = generate_valid_data_huobi["ch"].replace('market.', '').replace('.ticker', '').upper()
+        pair = generate_valid_data_huobi["ch"].replace("market.", "").replace(".ticker", "").upper()
         params = {"pair": pair, "exchange": "huobi"}
 
         await huobi_ws.handler_data(websocket, generate_valid_data_huobi)
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/", params=params)
+            response = await client.get("/currency/", params=params)
             result_data = response.json()
 
         ticket = result_data["ticket"]
@@ -262,7 +249,6 @@ class TestWebsocketsHandlers:
 
     @pytest.mark.asyncio
     async def test_huobi_currency_failed(self, generate_invalid_data_huobi: callable):
-
         huobi_ws = HuobiWebSocket(db=DB)
 
         with pytest.raises(TypeError):
@@ -281,7 +267,7 @@ class TestWebsocketsHandlers:
             item = {
                 "s": cur,
                 "a": round(random.uniform(1995.00, 4995.00), 2),
-                "b": round(random.uniform(1995.00, 4995.00), 2)
+                "b": round(random.uniform(1995.00, 4995.00), 2),
             }
             sample_data.append(item)
         return sample_data
@@ -292,20 +278,16 @@ class TestWebsocketsHandlers:
         currencies = ["BTCUSDT", "ETHUSD"]
         sample_data = []
         for cur in currencies:
-            item = {
-                "s": cur,
-                "a": random.choice(ascii_lowercase),
-                "b": round(random.uniform(1995.00, 4995.00), 2)
-            }
+            item = {"s": cur, "a": random.choice(ascii_lowercase), "b": round(random.uniform(1995.00, 4995.00), 2)}
             sample_data.append(item)
         return sample_data
 
     @pytest.mark.asyncio
     async def test_handlers_success(
-            self,
-            generate_valid_data_binance: callable,
-            generate_valid_data_kraken: callable,
-            generate_valid_data_huobi: callable,
+        self,
+        generate_valid_data_binance: callable,
+        generate_valid_data_kraken: callable,
+        generate_valid_data_huobi: callable,
     ):
         binance_ws = BinanceWebSocket(db=DB)
         kraken_ws = KrakenWebSocket(db=DB)
@@ -317,7 +299,7 @@ class TestWebsocketsHandlers:
         await kraken_ws.handler_data(generate_valid_data_kraken)
         await huobi_ws.handler_data(websocket, generate_valid_data_huobi)
         async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/")
+            response = await client.get("/currency/")
             result_data = response.json()
         assert response.status_code == 200
         assert "binance" in result_data["result"]["BTCUSDT"]
