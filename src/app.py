@@ -3,8 +3,8 @@ import asyncio
 from fastapi import FastAPI, HTTPException, Query
 
 from markets.binance import BinanceWebSocket
-from markets.kraken import KrakenWebSocket
 from markets.huobi import HuobiWebSocket
+from markets.kraken import KrakenWebSocket
 from markets.kucoin import KucoinWebSocket
 from .settings import logger
 from .utils import CurrencyAggregation, validate_crypto_pair
@@ -30,7 +30,7 @@ async def run_ws():
         return run_ws()
 
 
-@app.get("/")
+@app.get("/currency")
 async def main(pair: str = Query(None), exchange: str = Query(None)) -> dict:
     aggregated_prices = {}
     if pair and exchange:
@@ -67,3 +67,22 @@ async def main(pair: str = Query(None), exchange: str = Query(None)) -> dict:
                 raise e
 
     return {"result": aggregated_prices}
+
+
+@app.get('/info')
+async def info():
+    info = {
+        'exchanges': list(DB.keys()),
+        'requestsLinks': {
+            '/': {
+                'params': {
+                    'pair': 'str',
+                    'exchange': 'str',
+                }
+            },
+            'allowedMethods': {
+                '1': 'GET'
+            },
+        }
+    }
+    return info

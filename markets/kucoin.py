@@ -16,6 +16,7 @@ class KucoinWebSocket(BaseWebSocketMixin):
     Kukoin include wss channel for retrieving all traging pairs on the exchange
     We need to subscribe to channel and receive the information.
     '''
+
     def __init__(self, db: dict):
         super().__init__(name=MARKETS["Kucoin"]["name"], db=db, uri=None)
 
@@ -49,6 +50,8 @@ class KucoinWebSocket(BaseWebSocketMixin):
                 websocket: websockets.WebSocketClientProtocol,
                 ping_interval: int,
         ) -> None:
+
+            # [PING] - Sending message to the websocket for holding connection with the server
             message = {"type": "ping"}
             nonlocal last_ping_time
             try:

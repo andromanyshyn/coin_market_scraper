@@ -18,7 +18,8 @@ class CurrencyAggregation:
 def calculate_average_value(buy: str, sell: str) -> float:
     buy_float = float(buy)
     sell_float = float(sell)
-    return (buy_float + sell_float) / 2
+    average = (buy_float + sell_float) / 2
+    return round(average, 5)
 
 
 def validate_crypto_pair(pair: str) -> bool:

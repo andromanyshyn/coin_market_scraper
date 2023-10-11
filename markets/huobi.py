@@ -38,6 +38,7 @@ class HuobiWebSocket(BaseWebSocketMixin):
         except Exception as e:
             logger.error("Error while fetching assets for Huobi", str(e))
 
+    # method for establishing the WebSocket connection.
     async def connection(self) -> None:
         try:
             async with websockets.connect(self.uri) as websocket:
@@ -63,6 +64,7 @@ class HuobiWebSocket(BaseWebSocketMixin):
             logger.critical(str(e))
             raise e
 
+    # send list of assets to websocket
     async def send_websocket_message(self, websocket: websockets.WebSocketClientProtocol) -> None:
         assets_list = await self.fetch_huobi_assets()
         for element in assets_list:
