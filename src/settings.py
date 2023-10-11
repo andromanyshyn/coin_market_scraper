@@ -34,8 +34,12 @@ MARKETS = {
         "name": "binance",
         "endpoint": "wss://stream.binance.com:9443/ws/!ticker@arr",
     },
-    "Bitfinex": {
-        "name": "bitfinex",
-        "endpoint": "wss://api-pub.bitfinex.com/ws/2",
+    "Huobi": {
+        "name": "huobi",
+        "endpoint": "wss://api.huobi.pro/ws",
+        "pairs_endpoint": "https://api.huobi.pro/v1/common/symbols",
+    },
+    "Kucoin": {
+        "name": "kucoin",
     },
 }

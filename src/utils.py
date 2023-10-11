@@ -1,3 +1,6 @@
+import re
+
+
 class CurrencyAggregation:
     def __init__(self, exchange: str, prices: dict, data: dict):
         self.exchange_name = exchange
@@ -5,14 +8,19 @@ class CurrencyAggregation:
         self.data = data
 
     @property
-    async def aggregation(self):
+    def aggregation(self) -> None:
         for pair, data in self.prices.items():
             if pair not in self.data:
                 self.data[pair] = {}
             self.data[pair][self.exchange_name] = data
 
 
-async def calculate_average_value(buy: str, sell: str) -> float:
+def calculate_average_value(buy: str, sell: str) -> float:
     buy_float = float(buy)
     sell_float = float(sell)
     return (buy_float + sell_float) / 2
+
+
+def validate_crypto_pair(pair: str) -> bool:
+    pattern = '^[A-Za-z0-9]+$'
+    return bool(re.match(pattern, pair))

@@ -9,7 +9,7 @@ class CryptoBaseException(Exception):
         return self.message + f'Details: {self.args}'
 
 
-class WebsocketConnectionError(CryptoBaseException):
+class WebsocketConnectionError(ConnectionError):
     message = 'Connection Error. '
 
 
